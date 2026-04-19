@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio Admin</div>
+            <ul class="nav-links">
+                <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="/chat"><i class="fas fa-comment"></i> Чат</a></li>
+                <li><a href="/gallery"><i class="fas fa-images"></i> Галерея</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="margin: 2rem 0;">
+            <i class="fas fa-cog" style="color: var(--primary-color);"></i> 
+            Панель управления
+        </h1>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Статус API -->
+            <div class="generator-section" style="padding: 1.5rem;">
+                <h3><i class="fas fa-plug"></i> Статус API</h3>
+                <div id="api-status" style="margin-top: 1rem;">
+                    <p>⏳ Проверка...</p>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button onclick="checkApiStatus()" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                    <button onclick="testGigaChat()" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-robot"></i> Тест GigaChat
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="generator-section" style="padding: 1.5rem;">
+                <h3><i class="fas fa-chart-bar"></i> Статистика</h3>
+                <div id="stats" style="margin-top: 1rem;">
+                    <p>⏳ Загрузка...</p>
+                </div>
+            </div>
+
+            <!-- Информация о пользователе -->
+            <div class="generator-section" style="padding: 1.5rem;">
+                <h3><i class="fas fa-user-shield"></i> Администратор</h3>
+                <div id="admin-info" style="margin-top: 1rem;">
+                    <p>⏳ Загрузка...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Управление работами -->
+        <div class="generator-section">
+            <h2 style="margin-bottom: 1.5rem;">
+                <i class="fas fa-images"></i> 
+                Управление работами
+            </h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <p style="color: #94a3b8;">Всего работ: <span id="total-count" style="font-weight: bold; color: var(--primary-color);">0</span></p>
+                <button onclick="refreshArtworks()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-sync-alt"></i> Обновить
+                </button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Изображение</th>
+                            <th>Название</th>
+                            <th>Автор</th>
+                            <th>Дата</th>
+                            <th>Лайки</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-spinner fa-spin"></i> Загрузка...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Управление пользователями -->
+        <div class="generator-section" style="margin-top: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">
+                <i class="fas fa-users"></i> 
+                Управление пользователями
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Админ</th>
+                            <th>Дата регистрации</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-spinner fa-spin"></i> Загрузка...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для теста GigaChat -->
+    <div class="modal" id="testModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-modal" onclick="closeTestModal()">&times;</button>
+            <h3 style="margin-bottom: 1rem;">Результат теста GigaChat</h3>
+            <div id="testResult" style="background: var(--dark-bg); padding: 1rem; border-radius: 5px; overflow: auto; max-height: 400px;">
+                <p>Выполняется тест...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Проверка авторизации
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                
+                if (!data.authenticated || !data.isAdmin) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                currentUser = data;
+                document.getElementById('admin-info').innerHTML = `
+                    <p><i class="fas fa-user"></i> ${escapeHtml(data.username)}</p>
+                    <p><i class="fas fa-id-badge"></i> ID: ${data.userId}</p>
+                    <p><i class="fas fa-shield-alt"></i> Права: Администратор</p>
+                `;
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+
+        // Проверка статуса API
+        async function checkApiStatus() {
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Проверка...</p>';
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <p><i class="fas fa-check-circle" style="color: #10b981;"></i> Сервер: OK</p>
+                    <p><i class="fas fa-${data.airfail_configured ? 'check-circle' : 'times-circle'}" 
+                          style="color: ${data.airfail_configured ? '#10b981' : '#ef4444'};"></i> 
+                      air.fail: ${data.airfail_configured ? 'Подключен' : 'Не настроен'}</p>
+                    <p><i class="fas fa-${data.gigachat_configured ? 'check-circle' : 'times-circle'}" 
+                          style="color: ${data.gigachat_configured ? '#10b981' : '#ef4444'};"></i> 
+                      GigaChat: ${data.gigachat_configured ? 'Подключен' : 'Не настроен'}</p>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `<p style="color: #ef4444;">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+
+        // Тест GigaChat
+        async function testGigaChat() {
+            const modal = document.getElementById('testModal');
+            const resultDiv = document.getElementById('testResult');
+            modal.classList.add('active');
+            resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Выполняется тест GigaChat...</p>';
+            
+            try {
+                const response = await fetch('/api/gigachat/test');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = '<pre style="color: #10b981;">' + 
+                    JSON.stringify(data, null, 2) + 
+                    '</pre>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: #ef4444;">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+
+        function closeTestModal() {
+            document.getElementById('testModal').classList.remove('active');
+        }
+
+        // Загрузка работ
+        async function loadArtworks() {
+            try {
+                const response = await fetch('/api/admin/artworks');
+                const artworks = await response.json();
+                
+                document.getElementById('total-count').textContent = artworks.length;
+                
+                const tbody = document.getElementById('admin-table-body');
+                
+                if (artworks.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">Нет работ</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = artworks.map(art => `
+                    <tr>
+                        <td>${art.id}</td>
+                        <td>
+                            <img src="${art.image_url}" alt="${escapeHtml(art.title)}" 
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
+                                 onerror="this.src='https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=50'">
+                        </td>
+                        <td>${escapeHtml(art.title)}</td>
+                        <td>${escapeHtml(art.username)}</td>
+                        <td>${new Date(art.created_at).toLocaleDateString()}</td>
+                        <td>${art.likes}</td>
+                        <td>
+                            <button onclick="deleteArtwork(${art.id})" 
+                                    class="btn btn-primary" 
+                                    style="padding: 0.3rem 1rem; background: #ef4444; font-size: 0.9rem;">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+                document.getElementById('admin-table-body').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #ef4444;">❌ Ошибка загрузки</td></tr>';
+            }
+        }
+
+        // Загрузка пользователей
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const users = await response.json();
+                
+                const tbody = document.getElementById('users-table-body');
+                
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Нет пользователей</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${escapeHtml(user.username)}</td>
+                        <td>
+                            <span style="color: ${user.is_admin ? '#10b981' : '#94a3b8'};">
+                                <i class="fas fa-${user.is_admin ? 'check-circle' : 'times-circle'}"></i>
+                                ${user.is_admin ? 'Да' : 'Нет'}
+                            </span>
+                        </td>
+                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('users-table-body').innerHTML = 
+                    '<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">❌ Ошибка загрузки</td></tr>';
+            }
+        }
+
+        // Удаление работы
+        async function deleteArtwork(id) {
+            if (!confirm('Удалить эту работу?')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/artworks/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadArtworks();
+                    // Обновляем статистику
+                    loadStats();
+                }
+            } catch (error) {
+                alert('Ошибка при удалении');
+            }
+        }
+
+        // Загрузка статистики
+        async function loadStats() {
+            const statsDiv = document.getElementById('stats');
+            
+            try {
+                const artworks = await fetch('/api/artworks').then(r => r.json());
+                const users = await fetch('/api/admin/users').then(r => r.json());
+                
+                const totalLikes = artworks.reduce((sum, art) => sum + art.likes, 0);
+                
+                statsDiv.innerHTML = `
+                    <p><i class="fas fa-image"></i> Всего работ: ${artworks.length}</p>
+                    <p><i class="fas fa-user"></i> Всего пользователей: ${users.length}</p>
+                    <p><i class="fas fa-heart" style="color: #ef4444;"></i> Всего лайков: ${totalLikes}</p>
+                `;
+            } catch (error) {
+                statsDiv.innerHTML = `<p style="color: #ef4444;">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+
+        // Обновление списка работ
+        function refreshArtworks() {
+            loadArtworks();
+            loadStats();
+        }
+
+        // Выход
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+
+        // Защита от XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            checkApiStatus();
+            loadArtworks();
+            loadUsers();
+            loadStats();
+        });
+    </script>
+</body>
+</html>

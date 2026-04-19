@@ -1,0 +1,21 @@
+# Зависимости
+node_modules/
+
+# Переменные окружения (секреты)
+.env
+
+# База данных (локальная)
+database.sqlite
+data/*.sqlite
+
+# Логи
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

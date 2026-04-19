@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генерация - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/gallery">Галерея</a></li>
+                <li><a href="/generate" class="active">Генерация</a></li>
+                <li><a href="/login" id="login-link">Войти</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="generator-section">
+            <h2 style="margin-bottom: 1.5rem;">Генерация изображения</h2>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem;">Выберите модель:</label>
+                <select id="modelSelect" class="prompt-input" style="width: 100%;">
+                    <option value="sd">Stable Diffusion (баланс качества и скорости)</option>
+                    <option value="flux">Flux Schnell (быстрая генерация)</option>
+                    <option value="playground">Playground v2 (высокое качество)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <input type="text" id="prompt" class="prompt-input" 
+                       placeholder="Опишите изображение..." style="flex: 1;">
+                <button onclick="generateWithModel()" class="btn btn-primary" id="generateBtn">
+                    Сгенерировать
+                </button>
+            </div>
+
+            <div id="loading" style="display: none; text-align: center; margin: 2rem 0;">
+                <div class="loading">⏳ Генерация изображения...</div>
+            </div>
+
+            <div id="result" style="display: none; margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Результат:</h3>
+                <img id="generatedImage" class="generated-image" style="width: 100%; border-radius: 10px;" 
+                     src="" alt="Generated">
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <input type="text" id="imageTitle" class="prompt-input" 
+                           placeholder="Название работы" style="flex: 1;">
+                    <button onclick="saveToGallery()" class="btn btn-primary">
+                        Сохранить в галерею
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentImageUrl = '';
+        let currentPrompt = '';
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    alert('Для генерации необходимо войти');
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+            }
+        }
+
+        async function generateWithModel() {
+            const prompt = document.getElementById('prompt').value;
+            const model = document.getElementById('modelSelect').value;
+            
+            if (!prompt) {
+                alert('Введите описание изображения');
+                return;
+            }
+
+            let endpoint = '/api/generate';
+            if (model === 'flux') endpoint = '/api/generate/flux';
+            if (model === 'playground') endpoint = '/api/generate/playground';
+
+            const generateBtn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            generateBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                
+                if (data.imageUrl) {
+                    currentImageUrl = data.imageUrl;
+                    currentPrompt = prompt;
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    
+                    if (data.demo) {
+                        alert('Демо-режим: ' + data.message);
+                    }
+                    
+                    result.style.display = 'block';
+                }
+            } catch (error) {
+                alert('Ошибка при генерации');
+            } finally {
+                generateBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function saveToGallery() {
+            const title = document.getElementById('imageTitle').value;
+            
+            if (!title) {
+                alert('Введите название работы');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/artworks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        prompt: currentPrompt,
+                        imageUrl: currentImageUrl
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Работа сохранена в галерее!');
+                    document.getElementById('imageTitle').value = '';
+                    document.getElementById('prompt').value = '';
+                    document.getElementById('result').style.display = 'none';
+                }
+            } catch (error) {
+                alert('Ошибка при сохранении');
+            }
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

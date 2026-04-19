@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Галерея - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/gallery" class="active">Галерея</a></li>
+                <li><a href="/login" id="login-link">Войти</a></li>
+                <li><a href="/admin" id="admin-link" style="display: none;">Админ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Галерея работ</h1>
+            <p>Изображения, сгенерированные через air.fail API</p>
+            <div style="margin-top: 0.5rem; color: #94a3b8; font-size: 0.9rem;">
+                ⚡ Все работы созданы с помощью Flux Schnell
+            </div>
+        </section>
+
+        <div class="gallery-controls" style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <input type="text" id="searchInput" class="prompt-input" 
+                   placeholder="Поиск по названию или описанию..." style="flex: 1;">
+            <select id="sortSelect" class="prompt-input" style="width: auto; min-width: 150px;">
+                <option value="newest">Сначала новые</option>
+                <option value="oldest">Сначала старые</option>
+                <option value="popular">Популярные</option>
+            </select>
+        </div>
+
+        <div class="gallery-grid" id="gallery">
+            <!-- Галерея загружается через JS -->
+        </div>
+        
+        <div id="loading" style="display: none; text-align: center; padding: 2rem;">
+            <div class="loading">Загрузка галереи...</div>
+        </div>
+        
+        <div id="noResults" style="display: none; text-align: center; padding: 3rem;">
+            <h3>Ничего не найдено</h3>
+            <p>Попробуйте изменить параметры поиска</p>
+        </div>
+    </main>
+
+    <script src="/js/gallery.js"></script>
+</body>
+</html>

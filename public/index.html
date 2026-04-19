@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Art Studio - Генерация изображений</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/" class="active"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="/chat"><i class="fas fa-comment"></i> Чат GigaChat</a></li>
+                <li><a href="/gallery"><i class="fas fa-images"></i> Галерея</a></li>
+                <li><a href="/login" id="login-link"><i class="fas fa-sign-in-alt"></i> Войти</a></li>
+                <li><a href="/admin" id="admin-link" style="display: none;"><i class="fas fa-cog"></i> Админ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Создавайте изображения с помощью ИИ</h1>
+            <p>Генерация через air.fail (Flux Schnell) - бесплатно и быстро</p>
+            <div class="mode-badge airfail">⚡ air.fail</div>
+        </section>
+
+        <section class="generator-section">
+            <h2 style="margin-bottom: 1.5rem;">
+                <i class="fas fa-paint-brush" style="color: var(--airfail);"></i> 
+                Генератор изображений
+            </h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <input type="text" id="prompt" class="prompt-input" 
+                       placeholder="Опишите изображение на русском языке..." style="flex: 1;">
+                <button onclick="generateImage()" class="btn btn-primary" id="generateBtn">
+                    <i class="fas fa-magic"></i> Сгенерировать
+                </button>
+            </div>
+            
+            <div id="loading" style="display: none; text-align: center; margin: 2rem 0;">
+                <div class="loading">⏳ Генерация изображения...</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 style="margin: 2rem 0;">
+                <i class="fas fa-fire" style="color: var(--primary-color);"></i> 
+                Последние работы
+            </h2>
+            <div class="gallery-grid" id="gallery">
+                <!-- Галерея загружается через JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно результата -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3 style="margin-bottom: 1rem;">Ваше изображение готово!</h3>
+            <img id="generatedImage" class="generated-image" src="" alt="Generated">
+            
+            <div id="apiInfo" class="api-info" style="display: none;">
+                ✅ Сгенерировано через air.fail
+            </div>
+            
+            <input type="text" id="imageTitle" class="prompt-input" 
+                   placeholder="Название работы" style="margin: 1rem 0;">
+            
+            <button onclick="saveToGallery()" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Опубликовать в галерее
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

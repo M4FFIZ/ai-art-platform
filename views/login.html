@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .api-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 20px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin: 0.5rem;
+        }
+        
+        .api-badge.airfail {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+        
+        .api-badge.gigachat {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--dark-bg);
+            border: 2px solid #334155;
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            text-align: center;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .test-account {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .test-account p {
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .test-account code {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background: var(--dark-bg);
+            border-radius: 5px;
+            color: var(--primary-color);
+            font-family: monospace;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .feature i {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="/chat"><i class="fas fa-comment"></i> Чат</a></li>
+                <li><a href="/gallery"><i class="fas fa-images"></i> Галерея</a></li>
+                <li><a href="/login" class="active"><i class="fas fa-sign-in-alt"></i> Войти</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container login-container">
+        <div class="generator-section" style="padding: 2rem;">
+            <div class="login-header">
+                <h1>Добро пожаловать</h1>
+                <p style="color: #94a3b8;">Войдите в систему для доступа к функциям</p>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <div class="api-badge airfail">
+                    <i class="fas fa-paint-brush"></i> air.fail
+                </div>
+                <div class="api-badge gigachat">
+                    <i class="fas fa-robot"></i> GigaChat
+                </div>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label><i class="fas fa-user"></i> Логин</label>
+                    <input type="text" id="username" placeholder="Введите логин" value="admin" autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fas fa-lock"></i> Пароль</label>
+                    <input type="password" id="password" placeholder="Введите пароль" value="admin123">
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+
+            <div class="test-account">
+                <p><i class="fas fa-info-circle"></i> Тестовый аккаунт</p>
+                <p>
+                    <code>admin</code> / <code>admin123</code>
+                </p>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Генерация изображений</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Чат с GigaChat</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Галерея работ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Валидация
+            if (!username || !password) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            // Блокируем кнопку
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Успешный вход
+                    window.location.href = '/';
+                } else {
+                    // Ошибка входа
+                    showError(data.error || 'Неверный логин или пароль');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+                console.error('Login error:', error);
+            } finally {
+                // Разблокируем кнопку
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Войти';
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Автоматически скрываем через 5 секунд
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Добавляем обработчик для поля пароля (Enter)
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Добавляем обработчик для поля логина (Enter)
+        document.getElementById('username').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Проверяем, может пользователь уже авторизован
+        async function checkExistingSession() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    // Если уже авторизован, перенаправляем на главную
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Session check error:', error);
+            }
+        }
+
+        // Запускаем проверку при загрузке
+        checkExistingSession();
+    </script>
+</body>
+</html>

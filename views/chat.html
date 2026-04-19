@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigaChat - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="/chat" class="active"><i class="fas fa-comment"></i> Чат GigaChat</a></li>
+                <li><a href="/gallery"><i class="fas fa-images"></i> Галерея</a></li>
+                <li><a href="/login" id="login-link"><i class="fas fa-sign-in-alt"></i> Войти</a></li>
+                <li><a href="/admin" id="admin-link" style="display: none;"><i class="fas fa-cog"></i> Админ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1><i class="fas fa-robot" style="color: var(--gigachat);"></i> GigaChat</h1>
+            <p>Общайтесь с нейросетью от Сбера</p>
+            <div class="mode-badge gigachat">💬 GigaChat</div>
+        </section>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                    <i class="fas fa-info-circle"></i> Добро пожаловать в чат с GigaChat! Задавайте любые вопросы.
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" 
+                       placeholder="Введите сообщение..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" class="chat-send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button onclick="clearChat()" class="chat-clear-btn" id="clearBtn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/gigachat.js"></script>
+</body>
+</html>

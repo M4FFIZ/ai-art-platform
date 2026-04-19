@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - AI Art Studio</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">AI Art Studio</div>
+            <ul class="nav-links">
+                <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="/chat"><i class="fas fa-comment"></i> Чат</a></li>
+                <li><a href="/gallery"><i class="fas fa-images"></i> Галерея</a></li>
+                <li><a href="/login"><i class="fas fa-sign-in-alt"></i> Войти</a></li>
+                <li><a href="/register" class="active"><i class="fas fa-user-plus"></i> Регистрация</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 400px; margin-top: 80px;">
+        <div class="generator-section" style="padding: 2rem;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Регистрация</h2>
+            
+            <div id="error-message" style="color: #ef4444; margin-bottom: 1rem; text-align: center; display: none;"></div>
+            <div id="success-message" style="color: #10b981; margin-bottom: 1rem; text-align: center; display: none;"></div>
+            
+            <form id="registerForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Логин</label>
+                    <input type="text" id="username" class="prompt-input" required>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Email</label>
+                    <input type="email" id="email" class="prompt-input" required>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Пароль (минимум 6 символов)</label>
+                    <input type="password" id="password" class="prompt-input" required>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Подтверждение пароля</label>
+                    <input type="password" id="password2" class="prompt-input" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Зарегистрироваться
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem; color: #94a3b8;">
+                Уже есть аккаунт? <a href="/login" style="color: var(--primary-color);">Войти</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (!username || !email || !password) {
+                errorDiv.textContent = 'Заполните все поля';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password !== password2) {
+                errorDiv.textContent = 'Пароли не совпадают';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Пароль должен содержать не менее 6 символов';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    successDiv.textContent = 'Регистрация успешна! Перенаправление на главную...';
+                    successDiv.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    errorDiv.textContent = data.error || 'Ошибка регистрации';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Ошибка соединения';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
