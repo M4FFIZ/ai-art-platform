@@ -746,6 +746,10 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'register.html'));
+});
+
 app.get('/admin', (req, res) => {
     if (!req.session.isAdmin) {
         return res.redirect('/login');
@@ -834,6 +838,3 @@ process.on('SIGINT', () => {
 
 module.exports = app;
 
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'register.html'));
-});
