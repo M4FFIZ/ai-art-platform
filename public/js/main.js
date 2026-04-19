@@ -14,6 +14,10 @@ async function checkAuth() {
             document.getElementById('login-link').innerHTML = '<i class="fas fa-sign-out-alt"></i> Выйти';
             document.getElementById('login-link').href = '#';
             document.getElementById('login-link').onclick = logout;
+          if (data.authenticated) {
+    // ... существующий код
+    document.getElementById('register-link').style.display = 'none';
+}  
             
             if (data.isAdmin) {
                 document.getElementById('admin-link').style.display = 'inline-block';

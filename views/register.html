@@ -117,6 +117,9 @@
                 errorDiv.style.display = 'block';
             }
         });
+        app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'register.html'));
+});
     </script>
 </body>
 </html>
